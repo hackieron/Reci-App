@@ -33,7 +33,7 @@ const CreateRecipeScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('http://192.168.100.11:3000/api/recipes', {
+      const response = await axios.post('https://reci-app-2-ogmh1rmg8-hackierons-projects.vercel.app/api/recipes', {
         recipeName,
         ingredients,
         steps,

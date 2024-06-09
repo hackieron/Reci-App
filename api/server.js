@@ -35,6 +35,29 @@ app.post('/api/recipes', async (req, res) => {
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
 });
+// GET endpoint for retrieving a recipe by ID
+app.get('/api/recipes/:id', async (req, res) => {
+  try {
+    const recipeId = req.params.id;
+
+    // Retrieve the recipe document from Firestore
+    const recipeSnapshot = await db.collection('recipes').doc(recipeId).get();
+
+    // Check if the recipe exists
+    if (!recipeSnapshot.exists) {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
+
+    // Extract recipe data
+    const recipeData = recipeSnapshot.data();
+
+    // Respond with the retrieved recipe
+    res.status(200).json({ recipe: recipeData });
+  } catch (error) {
+    console.error('Error retrieving recipe:', error);
+    res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {
