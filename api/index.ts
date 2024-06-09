@@ -17,7 +17,7 @@ const db = admin.firestore();
 app.use(express.json());
 
 // POST endpoint for creating a new recipe
-app.post('/api/recipes', async (req, res) => {
+app.post('/api/recipes', async (req: { body: { recipeName: any; ingredients: any; steps: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { message?: string; recipeId?: any; error?: string; }): void; new(): any; }; }; }) => {
   try {
     const { recipeName, ingredients, steps } = req.body;
 
