@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 const serviceAccount = require('../backend/serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://console.firebase.google.com/u/0/project/reciapp-5cea0/firestore/data/~2'
+  databaseURL: 'https://console.firebase.google.com/u/0/project/reciapp-5cea0/firestore/databases/-default-/data/~2F'
 });
 
 // Firestore instance
@@ -16,13 +16,32 @@ const db = admin.firestore();
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+// Middleware to verify Firebase ID token
+const verifyToken = async (req, res, next) => {
+  const idToken = req.headers.authorization;
+  if (!idToken) {
+    return res.status(401).json({ error: 'Authorization header is required' });
+  }
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    req.uid = decodedToken.uid;
+    next();
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+
 // POST endpoint for creating a new recipe
-app.post('/api/recipes', async (req, res) => {
+app.post('/api/recipes', verifyToken, async (req, res) => {
   try {
     const { recipeName, ingredients, steps } = req.body;
+    const userId = req.uid;
 
     // Create new recipe document
     const recipeRef = await db.collection('recipes').add({
+      userId, // Add userId to the recipe document
       recipeName,
       ingredients,
       steps

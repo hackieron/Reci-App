@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { StyleSheet, Text, TextInput, ScrollView, Button } from 'react-native';
 import axios from 'axios';
 
@@ -6,6 +8,27 @@ const CreateRecipeScreen = () => {
   const [recipeName, setRecipeName] = useState('');
   const [ingredients, setIngredients] = useState(['']);
   const [steps, setSteps] = useState(['']);
+
+  useEffect(() => {
+    // Retrieve user token when component mounts
+    retrieveToken();
+  }, []);
+
+  const retrieveToken = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem('userToken');
+      if (userToken !== null) {
+        console.log('User token retrieved successfully:', userToken);
+        setToken(userToken); // Store the token in component state
+      } else {
+        console.log('No token found');
+      }
+    } catch (error) {
+      console.error('Error retrieving token:', error);
+    }
+  };
+
+  const [token, setToken] = useState('');
 
   const addIngredient = () => {
     setIngredients(prevIngredients => [...prevIngredients, '']);
@@ -33,18 +56,34 @@ const CreateRecipeScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('https://reci-app-test.vercel.app/api/recipes', {
+      // Log the request body and other relevant information
+      console.log('Request body:', {
         recipeName,
         ingredients,
         steps,
       });
+      console.log('Token:', token);
+  
+      const response = await axios.post(
+        'https://reci-app-test.vercel.app/api/recipes',
+        {
+          recipeName,
+          ingredients,
+          steps,
+        },
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
       alert('Recipe created successfully!');
     } catch (error) {
       console.error('Error creating recipe:', error);
       alert('Error creating recipe');
     }
   };
-
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Create Recipe</Text>

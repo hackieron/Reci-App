@@ -24,18 +24,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="CreateRecipeScreen"
+        name="explore"
         options={{
-          title: 'Create',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="SignUpScreen"
-        options={{
-          title: 'Sign Up',
+          title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
