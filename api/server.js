@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('./backend/serviceAccountKey.json');
+const serviceAccount = require('../backend/serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://console.firebase.google.com/u/0/project/reciapp-5cea0/firestore/data/~2'
