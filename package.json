@@ -17,6 +17,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@react-navigation/native": "^6.0.2",
+    "@types/firebase": "^3.2.1",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "expo": "~51.0.11",

@@ -16,6 +16,33 @@ const db = admin.firestore();
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+// Middleware to validate Firebase Authentication token
+const validateFirebaseToken = async (req, res, next) => {
+  const authToken = req.headers.authorization;
+  if (!authToken) {
+    return res.status(401).json({ error: 'Unauthorized: Missing authorization header' });
+  }
+
+  try {
+    // Verify Firebase Authentication token
+    const decodedToken = await admin.auth().verifyIdToken(authToken);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error('Error verifying Firebase token:', error);
+    res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
+  }
+};
+
+// Apply token validation middleware to all routes except '/'
+app.use((req, res, next) => {
+  if (req.path !== '/') {
+    validateFirebaseToken(req, res, next);
+  } else {
+    next();
+  }
+});
+
 // POST endpoint for creating a new recipe
 app.post('/api/recipes', async (req, res) => {
   try {
@@ -25,7 +52,8 @@ app.post('/api/recipes', async (req, res) => {
     const recipeRef = await db.collection('recipes').add({
       recipeName,
       ingredients,
-      steps
+      steps,
+      userId: req.user.uid // Include userId obtained from Firebase Authentication token
     });
 
     // Respond with success message and ID of the newly created recipe
@@ -34,6 +62,11 @@ app.post('/api/recipes', async (req, res) => {
     console.error('Error creating recipe:', error);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }
+});
+
+// Route handler for the root URL
+app.get('/', (req, res) => {
+  res.send('Welcome to the API');
 });
 
 // Start the server
